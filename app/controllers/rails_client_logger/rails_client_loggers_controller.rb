@@ -4,7 +4,7 @@ module RailsClientLogger
       if %w(debug info warn error fatal).include?(params[:level].to_s)
         level = params[:level].to_s.to_sym
         Rails.logger.send(level, params[:message])
-        if defined? ExceptionNotifier
+        if defined? ExceptionNotifier && Rails.env == 'production'
           ExceptionNotifier.notify_exception(Exception.new(params[:message]), env: request.env) if level == :fatal or level == :error
         end
         head :ok
