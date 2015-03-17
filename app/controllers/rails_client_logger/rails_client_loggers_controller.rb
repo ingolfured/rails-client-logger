@@ -5,7 +5,8 @@ module RailsClientLogger
         level = params[:level].to_s.to_sym
         Rails.logger.send(level, params[:message])
         if defined? ExceptionNotifier && Rails.env == 'production'
-          ExceptionNotifier.notify_exception(Exception.new(params[:message]), env: request.env) if level == :fatal or level == :error
+          ExceptionNotifier.notify_exception(Exception.new( ("User: " + current_user.name + "\n" + params[:message]) ), env: request.env) if level == :fatal or level == :error if defined? current_user
+          ExceptionNotifier.notify_exception(Exception.new(  params[:message] ), env: request.env) if level == :fatal or level == :error if not defined? current_user
         end
         head :ok
       else
